@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 用于存放数据库相关bean -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+	  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+       default-autowire="byName">
+
+    <context:component-scan base-package="com.jianchi"/>
+
+    <!-- 单元测试非springboot，因此需要手工载入配置文件-->
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath:application.properties</value>
+                <!--<value>classpath:application-dev.properties</value>-->
+            </list>
+        </property>
+        <property name="order" value="1"/>
+    </bean>
+
+    <!-- Mybatis session factory -->
+    <bean id="selfSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+          lazy-init="false">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath:sqlmapper/*.xml" />
+        <property name="configLocation" value="classpath:mybatis-config.xml" />
+    </bean>
+
+    <!--mapper映射接口包扫描路径 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.jianchi.dao" />
+        <property name="sqlSessionFactoryBeanName" value="selfSqlSessionFactory" />
+    </bean>
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="password" value="${password}"/>
+        <property name="username" value="${username}"/>
+        <property name="url" value="${url}"/>
+        <property name="driverClassName" value="${driverClassName}"/>
+    </bean>
+
+</beans>
